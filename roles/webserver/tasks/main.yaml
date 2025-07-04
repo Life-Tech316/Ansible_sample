@@ -1,0 +1,44 @@
+# install Nginx using Ansible
+# Start and Enable Nginx
+# Check the status of Nginx
+# Collect host information
+- name: Setup nginx server on myserver list (host group)
+  hosts:
+    - devservers
+  become: True
+  tasks:
+    - name: Install the latest version of nginx
+      command: amazon-linux-extras install nginx1 -y
+
+    - name: Start nginx service
+      service:
+        name: nginx
+        state: started
+
+    - name: Enable nginx service
+      service:
+        name: nginx
+        enabled: yes
+
+    - name: Get nginx Installed version
+      command: nginx -v
+
+    - name: Get status of nginx service
+      command: systemctl status nginx
+    
+    - name: Read external variable file
+      include_vars: vars.yaml
+
+    - name: Ansible copy file to remote server
+      copy:
+        content: |
+          <!DOCTYPE html>
+          <html>
+          <head>
+          <meta charset="UTF-8">
+          </head>
+          <body>
+          <h1>このページはcopyモジュールのcontentパラメータを使用してコピーしたページです！</h1>
+          </body>
+          </html>
+        dest: "{{ html_path }}index.html"
